@@ -33,8 +33,11 @@ struct LoginView: View {
                           .textInputAutocapitalization(.none)
                       
                       CustomButton(title: "Login", backgroundColor: .pink, onTap: {
-                          loginViewViewModel.login()
-                      })
+                          Task{
+                             await loginViewViewModel.login()
+                          }
+                      }, isLoading: loginViewViewModel.isLoading
+                      )
                    
                   }.padding(.all,16)
                   VStack

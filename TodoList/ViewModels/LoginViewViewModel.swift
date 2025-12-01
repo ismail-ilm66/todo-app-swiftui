@@ -8,17 +8,45 @@
 import Foundation
 import FirebaseAuth
 
+@MainActor
 class LoginViewViewModel : ObservableObject
 {
     
     @Published var email = ""
     @Published var password = ""
     @Published var errorMessage = ""
+    @Published var isLoading : Bool = false
+    
 
-    func login() {
+    func login() async {
         guard validateLoginFields() else
         {
             return
+        }
+        
+        DispatchQueue.main.async(execute: {
+            self.isLoading = true
+        })
+        defer
+        {
+            DispatchQueue.main.async(execute: {
+                self.isLoading = false
+            })
+            
+        }
+
+
+        do
+        {
+            _ = try await Auth.auth().signIn(withEmail: email, password: password)
+        }
+        catch
+        {
+            
+            DispatchQueue.main.async {
+                     self.errorMessage = error.localizedDescription
+                 }
+
         }
         
         

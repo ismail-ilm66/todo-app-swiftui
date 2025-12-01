@@ -40,7 +40,7 @@ struct RegisterView: View {
                     Task {
                                 await registerViewModel.register()
                             }
-                })
+                }, isLoading: registerViewModel.isLoading)
             }
             
         }

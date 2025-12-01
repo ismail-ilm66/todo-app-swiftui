@@ -9,6 +9,7 @@ import Foundation
 import FirebaseAuth
 import FirebaseFirestore
 
+@MainActor
 class RegisterViewModel : ObservableObject
 {
     
@@ -16,12 +17,23 @@ class RegisterViewModel : ObservableObject
     @Published var email = ""
     @Published var password = ""
     @Published var errorMessage = ""
+    @Published var isLoading : Bool = false
     
     func register () async
     {
         guard validateRegisterFields() else
         {
             return
+        }
+        DispatchQueue.main.async(execute: {
+            self.isLoading = true
+        })
+        defer
+        {
+            DispatchQueue.main.async(execute: {
+                self.isLoading = false
+            })
+            
         }
         
         do
@@ -39,7 +51,10 @@ class RegisterViewModel : ObservableObject
         }
         catch
         {
-            
+            DispatchQueue.main.async {
+                     self.errorMessage = error.localizedDescription
+                 }
+            print("Error Occured While Registering")
         }
         
     }

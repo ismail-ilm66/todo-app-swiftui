@@ -15,24 +15,32 @@ struct MainView: View {
         
         if mainViewModel.isSignedIn &&  !mainViewModel.currentUserId.isEmpty
         {
-            TabView
-            {
-                Tab("Home"  , systemImage: "house" )
-                {
-                    TodoListView()
-                }
-                Tab("Profile"  , systemImage: "person.circle" )
-                {
-                    ProfileView()
-                }
-            }
-            
+           
+            accountView
         }
         else
         {
             LoginView()
         }
         
+        
+        
+    }
+    
+    @ViewBuilder
+    var accountView : some View
+    {
+        TabView
+        {
+            Tab("Home"  , systemImage: "house" )
+            {
+                TodoListView(userId: mainViewModel.currentUserId)
+            }
+            Tab("Profile"  , systemImage: "person.circle" )
+            {
+                ProfileView()
+            }
+        }
     }
 }
 
