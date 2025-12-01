@@ -8,30 +8,39 @@
 import SwiftUI
 
 struct RegisterView: View {
-    @State var name  = ""
-    @State var email = ""
-    @State var password = ""
+    
+    @StateObject var registerViewModel : RegisterViewModel = RegisterViewModel()
+ 
     var body: some View {
         VStack{
             // Header
-            HeaderView(title: "Register" , subtitle: "Start Organizing Todos", backgroundColor:.orange,angle: -15, yOffsetVal: -120,)
+            HeaderView(title: "Register" , subtitle: "Start Organizing Todos", backgroundColor:.orange,angle: -15, yOffsetVal: -150,)
             
             // Form:
             Form{
-                TextField("Name" , text: $name)
-                
-                TextField("Email" , text: $email)
-                
-                TextField("Password" , text:$password)
-                
-                Button{
+                //Error Text:
+                if !registerViewModel.errorMessage.isEmpty
                     
-                } label: {
-                    
-                    ZStack{RoundedRectangle(cornerRadius: 10).foregroundColor(Color.blue)
-                        Text("Register").foregroundColor(Color.white).bold()
-                    }
+                {
+                    Text(registerViewModel.errorMessage).foregroundColor(.red)
                 }
+                
+                
+                TextField("Name" , text: $registerViewModel.name).textFieldStyle(DefaultTextFieldStyle())
+                    .autocorrectionDisabled()
+                
+                TextField("Email" , text: $registerViewModel.email).textFieldStyle(DefaultTextFieldStyle())
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.none)
+                
+                TextField("Password" , text:$registerViewModel.password).textFieldStyle(DefaultTextFieldStyle())
+                
+                CustomButton(title: "Register", backgroundColor: .orange, onTap: {
+                    
+                    Task {
+                                await registerViewModel.register()
+                            }
+                })
             }
             
         }
