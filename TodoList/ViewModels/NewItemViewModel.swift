@@ -6,12 +6,17 @@
 //
 
 import Foundation
+import FirebaseAuth
+import FirebaseFirestore
 
+@MainActor
 class NewItemViewModel : ObservableObject
 {
     @Published var title = ""
     @Published var dueDate = Date()
     @Published var showAlert : Bool = false
+    @Published var isLoading : Bool = false
+    @Published var errorMessage : String = ""
     
     
     
@@ -19,13 +24,53 @@ class NewItemViewModel : ObservableObject
         
     }
     
-    func save ()
+    func save () async
     {
         guard canSave else
             
         {
             return;
         }
+        
+        
+        guard let userId = Auth.auth().currentUser?.uid else
+        {
+            print("No user Signed In")
+            return
+            
+        }
+        
+        
+        DispatchQueue.main.async(execute: {
+            self.isLoading = true
+        })
+        defer
+        {
+            DispatchQueue.main.async(execute: {
+                self.isLoading = false
+            })
+            
+        }
+        
+        let newId = UUID().uuidString
+        let newItem = TodoModel(id: newId, title: title, dueDate: dueDate.timeIntervalSince1970, createdAt: Date().timeIntervalSince1970, isDone: false)
+        
+        
+       do
+       {
+           let db = Firestore.firestore()
+           
+        try await   db.collection("users").document(userId).collection("todos").document(newId).setData(newItem.asDictionary())
+           
+       }
+        catch
+        {
+            DispatchQueue.main.async {
+                self.errorMessage = error.localizedDescription
+                 }
+            print("Error Occured While Adding Todo Item")
+        }
+        
         
         
     }
