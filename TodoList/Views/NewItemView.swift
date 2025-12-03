@@ -32,19 +32,21 @@ struct NewItemView: View {
                 // Button:
                 CustomButton(title: "Save", backgroundColor: .pink, onTap:
                                 {
-//                    newItemViewModel.save()
-//                    newItemPresented = false
+
                     if newItemViewModel.canSave
                     {
-                        newItemViewModel.save()
-                        newItemPresented = false
+                        Task{
+                         await newItemViewModel.save()
+                            newItemPresented = false
+                        }
                     }
                     else
                     {
                         return
                     }
                     
-                })
+                },
+                             isLoading: newItemViewModel.isLoading)
             }
             
             
